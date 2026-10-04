@@ -4,6 +4,8 @@ A small, responsive alcohol impairment calculator for GitHub Pages. Enter body w
 
 **Live site:** https://bapple51.github.io/bottle-bac/
 
+The dark interface includes editable drink presets, shot-size shortcuts, a plus/minus shot counter, a live poured/remaining-volume meter, field-specific validation, and a reset button. The desktop estimate stays visible while scrolling; a compact mobile estimate links to the full result. The BAC visualization shows both ends of the model range on a scale ending at 0.32%; the numeric BAC is never capped. Results use four decimal places so rounding is less likely to obscure a classification boundary. Reduced-motion preferences and keyboard navigation are supported.
+
 All calculations run in the browser. There are no dependencies, analytics, input storage, or backend requests. The site itself is hosted by GitHub; GitHub's normal hosting access logging still applies.
 
 ## Run locally

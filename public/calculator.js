@@ -166,34 +166,38 @@ export function classify(bac, alcoholGrams) {
   };
 }
 
+function inputError(message, field) {
+  return Object.assign(new Error(message), { field });
+}
+
 export function calculate(input) {
   if (!input || typeof input !== 'object') throw new Error('Enter your numbers to calculate an estimate.');
   const { weight, weightUnit, volume, volumeUnit, abv, portion, hours, consumptionMode = 'portion', shotVolume, shotUnit, shotCount } = input;
   for (const [name, value] of Object.entries({ weight, volume, abv, hours })) {
-    if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error(`Enter a valid number for ${name}.`);
+    if (typeof value !== 'number' || !Number.isFinite(value)) throw inputError(`Enter a valid number for ${name}.`, name);
   }
-  if (!['lb', 'kg'].includes(weightUnit)) throw new Error('Choose lb or kg for your weight.');
-  if (!Object.hasOwn(VOLUME_FACTORS, volumeUnit)) throw new Error('Choose a valid bottle volume unit.');
+  if (!['lb', 'kg'].includes(weightUnit)) throw inputError('Choose lb or kg for your weight.', 'weightUnit');
+  if (!Object.hasOwn(VOLUME_FACTORS, volumeUnit)) throw inputError('Choose a valid bottle volume unit.', 'volumeUnit');
   const weightKg = weight * (weightUnit === 'lb' ? KG_PER_LB : 1);
   const bottleMl = volume * VOLUME_FACTORS[volumeUnit];
-  if (weightKg < 0.453 || weightKg > 500) throw new Error('Enter a positive weight up to 500 kg (about 1,102 lb).');
-  if (bottleMl <= 0 || bottleMl > 100000) throw new Error('Enter a bottle volume greater than 0 and up to 100 L.');
-  if (abv < 0 || abv > 100) throw new Error('ABV must be between 0% and 100%.');
-  if (hours < 0 || hours > 24) throw new Error('Drinking duration must be between 0 and 24 hours.');
+  if (weightKg < 0.453 || weightKg > 500) throw inputError('Enter a positive weight up to 500 kg (about 1,102 lb).', 'weight');
+  if (bottleMl <= 0 || bottleMl > 100000) throw inputError('Enter a bottle volume greater than 0 and up to 100 L.', 'volume');
+  if (abv < 0 || abv > 100) throw inputError('ABV must be between 0% and 100%.', 'abv');
+  if (hours < 0 || hours > 24) throw inputError('Drinking duration must be between 0 and 24 hours.', 'hours');
   let consumedMl;
   if (consumptionMode === 'portion') {
-    if (typeof portion !== 'number' || !Number.isFinite(portion)) throw new Error('Enter a valid number for portion.');
-    if (portion < 0 || portion > 100) throw new Error('The amount to drink must be between 0% and 100% of the bottle.');
+    if (typeof portion !== 'number' || !Number.isFinite(portion)) throw inputError('Enter a valid number for portion.', 'portion');
+    if (portion < 0 || portion > 100) throw inputError('The amount to drink must be between 0% and 100% of the bottle.', 'portion');
     consumedMl = bottleMl * portion / 100;
   } else if (consumptionMode === 'shots') {
-    if (typeof shotVolume !== 'number' || !Number.isFinite(shotVolume) || shotVolume <= 0) throw new Error('Enter a shot size greater than 0.');
-    if (!['ml', 'oz'].includes(shotUnit)) throw new Error('Choose mL or US fl oz for your shot size.');
-    if (typeof shotCount !== 'number' || !Number.isFinite(shotCount) || shotCount < 0) throw new Error('Enter a number of shots of 0 or more.');
+    if (typeof shotVolume !== 'number' || !Number.isFinite(shotVolume) || shotVolume <= 0) throw inputError('Enter a shot size greater than 0.', 'shotVolume');
+    if (!['ml', 'oz'].includes(shotUnit)) throw inputError('Choose mL or US fl oz for your shot size.', 'shotUnit');
+    if (typeof shotCount !== 'number' || !Number.isFinite(shotCount) || shotCount < 0) throw inputError('Enter a number of shots of 0 or more.', 'shotCount');
     const shotMl = shotVolume * VOLUME_FACTORS[shotUnit];
-    if (shotMl > 100000) throw new Error('Enter a shot size no greater than 100 L.');
+    if (shotMl > 100000) throw inputError('Enter a shot size no greater than 100 L.', 'shotVolume');
     consumedMl = shotMl * shotCount;
     // Unit conversion can introduce a tiny rounding difference for a full bottle.
-    if (!Number.isFinite(consumedMl) || consumedMl > bottleMl + bottleMl * 1e-9) throw new Error('Those shots exceed the bottle volume. Check the shot size, shot count, or bottle volume.');
+    if (!Number.isFinite(consumedMl) || consumedMl > bottleMl + bottleMl * 1e-9) throw inputError('Those shots exceed the bottle volume. Check the shot size, shot count, or bottle volume.', 'shotCount');
     consumedMl = Math.min(consumedMl, bottleMl);
   } else {
     throw new Error('Choose bottle percentage or shots to enter the amount.');

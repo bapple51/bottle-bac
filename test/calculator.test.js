@@ -93,7 +93,7 @@ test('direct classification rejects invalid values and zero alcohol overrides ev
 });
 test('malformed and out-of-range inputs are rejected instead of producing stale or NaN results', () => {
   for (const key of ['weight', 'volume', 'abv', 'portion', 'hours']) {
-    for (const value of [NaN, Infinity, '', null, '10']) assert.throws(() => calculate({ ...sample, [key]: value }));
+    for (const value of [NaN, Infinity, '', null, '10']) assert.throws(() => calculate({ ...sample, [key]: value }), (error) => error.field === key);
   }
   for (const patch of [{ weight: 0 }, { weight: -1 }, { weight: 501 }, { volume: 0 }, { volume: -1 }, { volume: 100001 }, { abv: -1 }, { abv: 101 }, { portion: -1 }, { portion: 101 }, { hours: -1 }, { hours: 25 }, { weightUnit: 'stone' }, { volumeUnit: 'constructor' }]) assert.throws(() => calculate({ ...sample, ...patch }));
 });
@@ -134,5 +134,5 @@ test('shots mode ignores bottle percentage, and portion mode ignores inactive sh
 test('invalid shot values and amounts larger than the bottle are rejected', () => {
   const shots = { ...sample, consumptionMode: 'shots', shotVolume: 50, shotUnit: 'ml', shotCount: 3 };
   for (const patch of [{ shotVolume: 0 }, { shotVolume: -1 }, { shotVolume: NaN }, { shotVolume: Infinity }, { shotVolume: '50' }, { shotVolume: 100001 }, { shotUnit: 'l' }, { shotUnit: 'constructor' }, { shotCount: -1 }, { shotCount: NaN }, { shotCount: Infinity }, { shotCount: '3' }, { shotCount: 16 }, { consumptionMode: 'invalid' }]) assert.throws(() => calculate({ ...shots, ...patch }));
-  assert.throws(() => calculate({ ...shots, shotCount: 16 }), /exceed the bottle/);
+  assert.throws(() => calculate({ ...shots, shotCount: 16 }), { message: /exceed the bottle/, field: 'shotCount' });
 });

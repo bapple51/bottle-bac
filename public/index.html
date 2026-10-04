@@ -3,51 +3,69 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Estimate alcohol impairment from your weight, bottle size, ABV, and the amount you drink. A private, browser-only educational calculator.">
-  <meta name="theme-color" content="#111d2d">
+  <meta name="description" content="Estimate alcohol impairment from your weight, bottle size, ABV, and your pour or shot count. A private, browser-only educational calculator.">
+  <meta name="theme-color" content="#101318">
   <title>Bottle BAC — How drunk could you get?</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111d2d'/%3E%3Cpath d='M8 23V15M16 23V8M24 23V12' stroke='%23ffb45b' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23101318'/%3E%3Cpath d='M8 23V15M16 23V8M24 23V12' stroke='%23ffca7a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./styles.css">
   <script type="module" src="./app.js"></script>
 </head>
 <body>
-  <header class="site-header"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">B.</span>Bottle BAC</a><span class="header-note">An estimate, not a breathalyzer</span></header>
+  <a class="skip-link" href="#calculator-form">Skip to calculator</a>
+  <header class="site-header"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">B.</span>Bottle<span class="brand-light">BAC</span></a><span class="header-note">Stays in your browser.</span></header>
   <main>
-    <div class="intro"><p class="eyebrow">THE BOTTLE MATH</p><h1>How drunk could you get?</h1><p>Put in your numbers. See what that pour could mean.</p></div>
+    <div class="intro"><div><p class="eyebrow">BAC CALCULATOR</p><h1>How drunk could you get?</h1></div><span class="intro-note">An estimate,<br>not a breathalyzer.</span></div>
     <div class="calculator">
       <section class="inputs panel" aria-labelledby="input-heading">
-        <div class="section-heading"><h2 id="input-heading">Your numbers</h2><span>01 / INPUT</span></div>
+        <div class="panel-heading"><h2 id="input-heading">Make it your pour</h2><button type="button" id="reset-inputs" class="text-button">Reset</button></div>
         <form id="calculator-form" novalidate>
-          <div class="field"><label for="weight">Your weight</label><div class="input-with-unit"><input id="weight" name="weight" type="number" inputmode="decimal" min="1" max="1102" step="any" value="170" required><select id="weight-unit" aria-label="Weight unit"><option value="lb">lb</option><option value="kg">kg</option></select></div></div>
-          <div class="field-row">
-            <div class="field"><label for="volume">Bottle volume</label><div class="input-with-unit"><input id="volume" name="volume" type="number" inputmode="decimal" min="0.01" max="100000" step="any" value="750" required><select id="volume-unit" aria-label="Bottle volume unit"><option value="ml">mL</option><option value="l">L</option><option value="oz">US fl oz</option></select></div></div>
-            <div class="field"><label for="abv">Alcohol by volume</label><div class="input-with-unit"><input id="abv" name="abv" type="number" inputmode="decimal" min="0" max="100" step="any" value="12" required><span class="unit" aria-hidden="true">%</span></div></div>
-          </div>
-          <div class="presets" aria-label="Bottle examples"><span>Try a bottle</span><button type="button" data-volume="355" data-abv="5">Beer</button><button type="button" data-volume="750" data-abv="12">Wine</button><button type="button" data-volume="750" data-abv="40">Spirits</button></div>
-          <div class="portion-field">
-            <fieldset class="consumption-mode"><legend>How are you measuring your drink?</legend><div class="mode-options"><label><input type="radio" name="consumption-mode" value="portion" checked>Bottle %</label><label><input type="radio" name="consumption-mode" value="shots">Shots</label></div></fieldset>
-            <div id="portion-inputs"><div class="portion-heading"><label for="portion">How much will you drink?</label><div class="portion-number"><input id="portion" name="portion" type="number" inputmode="decimal" min="0" max="100" step="any" value="50" required><span>%</span></div></div><input id="portion-slider" type="range" min="0" max="100" step="1" value="50" aria-label="Percentage of the bottle to drink"><div class="slider-labels"><span>None</span><span>The whole bottle</span></div><div class="portion-presets" aria-label="Bottle fractions"><button type="button" data-portion="25">¼ bottle</button><button type="button" data-portion="50" aria-pressed="true">½ bottle</button><button type="button" data-portion="75">¾ bottle</button><button type="button" data-portion="100">Full bottle</button></div></div>
-            <div id="shot-inputs" hidden>
-              <div class="field-row shot-fields"><div class="field"><label for="shot-volume">Shot size</label><div class="input-with-unit"><input id="shot-volume" name="shot-volume" type="number" inputmode="decimal" min="0.000001" step="any" value="1.5" required disabled><select id="shot-unit" aria-label="Shot size unit" disabled><option value="oz">US fl oz</option><option value="ml">mL</option></select></div></div><div class="field"><label for="shot-count">Shots you had</label><div class="input-with-unit"><input id="shot-count" name="shot-count" type="number" inputmode="decimal" min="0" step="any" value="2" required disabled></div></div></div>
-              <p class="field-help">Poured from the bottle above, using its ABV. Enter your actual shot size; partial shots are allowed.</p>
+          <section class="form-section" aria-labelledby="drink-heading">
+            <div class="section-heading"><span class="step-number">01</span><h3 id="drink-heading">The bottle</h3></div>
+            <div class="presets" aria-label="Bottle examples"><button type="button" data-volume="355" data-abv="5" aria-pressed="false"><strong>Beer</strong><span>355 mL · 5%</span></button><button type="button" data-volume="750" data-abv="12" aria-pressed="true"><strong>Wine</strong><span>750 mL · 12%</span></button><button type="button" data-volume="750" data-abv="40" aria-pressed="false"><strong>Spirits</strong><span>750 mL · 40%</span></button></div>
+            <div class="field-row bottle-fields">
+              <div class="field"><label for="volume">Bottle volume</label><div class="input-with-unit"><input id="volume" name="volume" type="number" inputmode="decimal" min="0.000001" max="100000" step="any" value="750" required><select id="volume-unit" aria-label="Bottle volume unit"><option value="ml">mL</option><option value="l">L</option><option value="oz">US fl oz</option></select></div></div>
+              <div class="field"><label for="abv">ABV <span class="label-hint">alcohol %</span></label><div class="input-with-unit"><input id="abv" name="abv" type="number" inputmode="decimal" min="0" max="100" step="any" value="12" required><span class="unit" aria-hidden="true">%</span></div></div>
             </div>
-            <p class="pour-note" id="pour-note">That’s 375 mL of your bottle.</p>
-          </div>
-          <div class="field time-field"><label for="hours">Over how many hours?</label><div class="input-with-unit"><input id="hours" name="hours" type="number" inputmode="decimal" min="0" max="24" step="any" value="1" required><span class="unit">hours</span></div><p class="field-help">Time from first sip to last. Use 0 for no time adjustment.</p></div>
+            <p class="field-help">Examples only. Use the volume and ABV on your bottle’s label.</p>
+          </section>
+          <section class="form-section portion-field" aria-labelledby="pour-heading">
+            <div class="section-heading"><span class="step-number">02</span><h3 id="pour-heading">Your pour</h3></div>
+            <fieldset class="consumption-mode"><legend class="sr-only">How are you measuring your drink?</legend><div class="mode-options"><label><input type="radio" name="consumption-mode" value="portion" checked>Percentage of bottle</label><label><input type="radio" name="consumption-mode" value="shots">Number of shots</label></div></fieldset>
+            <div id="portion-inputs">
+              <div class="portion-heading"><label for="portion">How much of the bottle?</label><div class="portion-number"><input id="portion" name="portion" type="number" inputmode="decimal" min="0" max="100" step="any" value="50" required><span>%</span></div></div>
+              <input id="portion-slider" type="range" min="0" max="100" step="1" value="50" aria-label="Percentage of the bottle to drink"><div class="slider-labels"><span>0%</span><span>100%</span></div>
+              <div class="portion-presets quick-options" aria-label="Bottle fractions"><button type="button" data-portion="25">¼ bottle</button><button type="button" data-portion="50" aria-pressed="true">½ bottle</button><button type="button" data-portion="75">¾ bottle</button><button type="button" data-portion="100">Full bottle</button></div>
+            </div>
+            <div id="shot-inputs" hidden>
+              <div class="field-row shot-fields">
+                <div class="field"><label for="shot-volume">Size of each shot</label><div class="input-with-unit"><input id="shot-volume" name="shot-volume" type="number" inputmode="decimal" min="0.000001" step="any" value="1.5" required disabled><select id="shot-unit" aria-label="Shot size unit" disabled><option value="oz">US fl oz</option><option value="ml">mL</option></select></div></div>
+                <div class="field"><label for="shot-count">Shots you had</label><div class="shot-counter"><button type="button" id="shot-minus" aria-label="Remove one shot" disabled>−</button><input id="shot-count" name="shot-count" type="number" inputmode="decimal" min="0" step="any" value="2" required disabled><button type="button" id="shot-plus" aria-label="Add one shot" disabled>+</button></div></div>
+              </div>
+              <div class="quick-options shot-presets" aria-label="Shot size presets"><span>Shot size</span><button type="button" data-shot-volume="30" data-shot-unit="ml">30 mL</button><button type="button" data-shot-volume="50" data-shot-unit="ml">50 mL</button><button type="button" data-shot-volume="1.5" data-shot-unit="oz">1.5 US fl oz</button></div>
+              <p class="field-help">Poured from the bottle above, using its ABV. Partial shots are allowed.</p>
+            </div>
+            <div class="pour-breakdown"><div class="pour-amount"><span id="poured-amount">375 mL poured</span><span id="remaining-amount">375 mL left</span></div><meter id="pour-meter" min="0" max="100" value="50" aria-label="Percentage of bottle consumed">50%</meter><p class="pour-note" id="pour-note">That’s 375 mL of your bottle.</p></div>
+          </section>
+          <section class="form-section about-section" aria-labelledby="about-heading">
+            <div class="section-heading"><span class="step-number">03</span><h3 id="about-heading">You &amp; the timing</h3></div>
+            <div class="field-row about-fields"><div class="field"><label for="weight">Your weight</label><div class="input-with-unit"><input id="weight" name="weight" type="number" inputmode="decimal" min="1" max="1102" step="any" value="170" required><select id="weight-unit" aria-label="Weight unit"><option value="lb">lb</option><option value="kg">kg</option></select></div></div><div class="field time-field"><label for="hours">Drinking duration</label><div class="input-with-unit"><input id="hours" name="hours" type="number" inputmode="decimal" min="0" max="24" step="any" value="1" required aria-describedby="hours-help"><span class="unit">hours</span></div></div></div>
+            <p class="field-help" id="hours-help">From first sip to last. Use 0 to skip the time adjustment.</p>
+          </section>
           <p id="form-error" class="form-error" role="alert" hidden></p>
-          <p class="privacy-note">Your inputs stay in this tab. No account or tracking.</p>
+          <p class="privacy-note">Nothing saved. No account. No tracking.</p>
         </form>
       </section>
-      <section class="result panel" aria-labelledby="result-heading">
-        <div class="section-heading"><h2 id="result-heading">The estimate</h2><span>02 / RESULT</span></div>
+      <section class="result panel" id="result-panel" aria-labelledby="result-heading" data-level="medium">
+        <div class="panel-heading"><h2 id="result-heading">Your estimate</h2><span class="result-badge">LIVE</span></div>
         <div id="result-content" aria-live="polite" aria-atomic="true">
-          <p class="result-kicker">POSSIBLE IMPAIRMENT</p><h3 id="drunk-label">—</h3><p id="effect-description" class="effect-description">Enter your numbers to get an estimate.</p>
-          <div class="bac-block"><span>Estimated BAC at the end of drinking</span><p id="bac-value">—</p><span class="range-note">Model range · your actual BAC can be outside it</span></div>
-          <div class="bac-scale" aria-hidden="true"><div class="scale-track"><span id="scale-marker"></span></div><div class="scale-labels"><span>0%</span><span>0.08%</span><span>0.16%</span><span>0.24%+</span></div></div>
-          <div class="stats"><div><span id="drink-count">—</span><p>US standard drinks</p></div><div><span id="alcohol-grams">—</span><p>grams of pure alcohol</p></div></div>
-          <p class="classification-note">The label uses the upper end of the estimate. It describes possible effects, not how you will definitely feel.</p>
+          <div class="result-kicker"><span>POSSIBLE EFFECTS</span><span id="result-context">50% of bottle</span></div><h3 id="drunk-label">—</h3><p id="effect-description" class="effect-description">Enter your numbers to get an estimate.</p>
+          <div class="bac-block"><span>Estimated blood alcohol concentration</span><p id="bac-value">—</p><span class="range-note">At the end of drinking · actual BAC can fall outside this range</span>
+            <div class="bac-scale" id="bac-chart" role="img" aria-label="Estimated BAC range"><div class="scale-track"><span id="range-band"></span><span id="scale-marker"></span></div><div class="scale-labels" aria-hidden="true"><span>0%</span><span>0.08%</span><span>0.16%</span><span>0.24%</span><span>0.32%+</span></div></div>
+          </div>
+          <div class="stats"><div><span id="consumed-volume">—</span><p>mL consumed</p></div><div><span id="drink-count">—</span><p>US standard drinks</p></div><div><span id="alcohol-grams">—</span><p>grams of alcohol</p></div></div>
+          <p class="classification-note">The label uses the upper model estimate. It describes possible effects, not how you will definitely feel.</p>
         </div>
-        <div class="driving-note"><strong>If you drink, don’t drive.</strong><p>This calculator cannot tell you when you’re sober or safe to drive. Even a result of 0.000% doesn’t prove sobriety.</p></div>
+        <div class="driving-note"><span class="note-symbol" aria-hidden="true">!</span><div><strong>An estimate is never a green light.</strong><p>If you drink, don’t drive. Even 0.0000% doesn’t prove you’re sober or safe to drive.</p></div></div>
       </section>
     </div>
     <div class="below-calculator">
@@ -56,6 +74,7 @@
     </div>
   </main>
   <footer><span>Bottle BAC · Educational estimates only</span><a href="https://github.com/bapple51/bottle-bac">View the source</a></footer>
+  <aside class="mobile-result" id="mobile-result" aria-label="Quick estimate" hidden><div><span id="mobile-label">Your estimate</span><span id="mobile-bac">—</span></div><a href="#result-panel">View estimate</a></aside>
   <noscript><p class="noscript">Enable JavaScript to use this calculator. Your inputs are processed in your browser.</p></noscript>
 </body>
 </html>
