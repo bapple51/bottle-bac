@@ -1,0 +1,12 @@
+{
+  "name": "bottle-bac",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An educational alcohol impairment and BAC estimator for GitHub Pages",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check public/app.js && node --check public/calculator.js"
+  },
+  "engines": { "node": ">=22" }
+}

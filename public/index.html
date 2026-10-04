@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Estimate alcohol impairment from your weight, bottle size, ABV, and the amount you drink. A private, browser-only educational calculator.">
+  <meta name="theme-color" content="#111d2d">
+  <title>Bottle BAC — How drunk could you get?</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111d2d'/%3E%3Cpath d='M8 23V15M16 23V8M24 23V12' stroke='%23ffb45b' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">B.</span>Bottle BAC</a><span class="header-note">An estimate, not a breathalyzer</span></header>
+  <main>
+    <div class="intro"><p class="eyebrow">THE BOTTLE MATH</p><h1>How drunk could you get?</h1><p>Put in your numbers. See what that pour could mean.</p></div>
+    <div class="calculator">
+      <section class="inputs panel" aria-labelledby="input-heading">
+        <div class="section-heading"><h2 id="input-heading">Your numbers</h2><span>01 / INPUT</span></div>
+        <form id="calculator-form" novalidate>
+          <div class="field"><label for="weight">Your weight</label><div class="input-with-unit"><input id="weight" name="weight" type="number" inputmode="decimal" min="1" max="1102" step="any" value="170" required><select id="weight-unit" aria-label="Weight unit"><option value="lb">lb</option><option value="kg">kg</option></select></div></div>
+          <div class="field-row">
+            <div class="field"><label for="volume">Bottle volume</label><div class="input-with-unit"><input id="volume" name="volume" type="number" inputmode="decimal" min="0.01" max="100000" step="any" value="750" required><select id="volume-unit" aria-label="Bottle volume unit"><option value="ml">mL</option><option value="l">L</option><option value="oz">US fl oz</option></select></div></div>
+            <div class="field"><label for="abv">Alcohol by volume</label><div class="input-with-unit"><input id="abv" name="abv" type="number" inputmode="decimal" min="0" max="100" step="any" value="12" required><span class="unit" aria-hidden="true">%</span></div></div>
+          </div>
+          <div class="presets" aria-label="Bottle examples"><span>Try a bottle</span><button type="button" data-volume="355" data-abv="5">Beer</button><button type="button" data-volume="750" data-abv="12">Wine</button><button type="button" data-volume="750" data-abv="40">Spirits</button></div>
+          <div class="portion-field"><div class="portion-heading"><label for="portion">How much will you drink?</label><div class="portion-number"><input id="portion" name="portion" type="number" inputmode="decimal" min="0" max="100" step="any" value="50" required><span>%</span></div></div><input id="portion-slider" type="range" min="0" max="100" step="1" value="50" aria-label="Percentage of the bottle to drink"><div class="slider-labels"><span>None</span><span>The whole bottle</span></div><div class="portion-presets" aria-label="Bottle fractions"><button type="button" data-portion="25">¼ bottle</button><button type="button" data-portion="50" aria-pressed="true">½ bottle</button><button type="button" data-portion="75">¾ bottle</button><button type="button" data-portion="100">Full bottle</button></div><p class="pour-note" id="pour-note">That’s 375 mL of your bottle.</p></div>
+          <div class="field time-field"><label for="hours">Over how many hours?</label><div class="input-with-unit"><input id="hours" name="hours" type="number" inputmode="decimal" min="0" max="24" step="any" value="1" required><span class="unit">hours</span></div><p class="field-help">Time from first sip to last. Use 0 for no time adjustment.</p></div>
+          <p id="form-error" class="form-error" role="alert" hidden></p>
+          <p class="privacy-note">Your inputs stay in this tab. No account or tracking.</p>
+        </form>
+      </section>
+      <section class="result panel" aria-labelledby="result-heading">
+        <div class="section-heading"><h2 id="result-heading">The estimate</h2><span>02 / RESULT</span></div>
+        <div id="result-content" aria-live="polite" aria-atomic="true">
+          <p class="result-kicker">POSSIBLE IMPAIRMENT</p><h3 id="drunk-label">—</h3><p id="effect-description" class="effect-description">Enter your numbers to get an estimate.</p>
+          <div class="bac-block"><span>Estimated BAC at the end of drinking</span><p id="bac-value">—</p><span class="range-note">Model range · your actual BAC can be outside it</span></div>
+          <div class="bac-scale" aria-hidden="true"><div class="scale-track"><span id="scale-marker"></span></div><div class="scale-labels"><span>0%</span><span>0.08%</span><span>0.16%</span><span>0.24%+</span></div></div>
+          <div class="stats"><div><span id="drink-count">—</span><p>US standard drinks</p></div><div><span id="alcohol-grams">—</span><p>grams of pure alcohol</p></div></div>
+          <p class="classification-note">The label uses the upper end of the estimate. It describes possible effects, not how you will definitely feel.</p>
+        </div>
+        <div class="driving-note"><strong>If you drink, don’t drive.</strong><p>This calculator cannot tell you when you’re sober or safe to drive. Even a result of 0.000% doesn’t prove sobriety.</p></div>
+      </section>
+    </div>
+    <div class="below-calculator">
+      <details class="method"><summary>How this estimate works</summary><div class="method-content"><p>We calculate pure alcohol from bottle volume × the fraction you drink × ABV × 0.789 grams per mL. A US standard drink contains 14 grams of alcohol.</p><p>The simplified Widmark model divides that alcohol by body weight and a distribution factor, then subtracts 0.015 percentage points per hour. We use factors of 0.68 and 0.55 to show two common model assumptions instead of asking for sex. This is a sensitivity range, not a confidence interval or an upper limit.</p><p>The model assumes the selected alcohol has been absorbed and you started with no alcohol in your system. It does not model each sip or delayed absorption. Food, body composition, age, health, medications, drinking speed, and individual metabolism change the result. BAC can keep rising after your last drink. These adult population assumptions are not suitable for children.</p><p>Labels are approximate: “Little noticeable effect” below 0.02%, “Buzzed” from 0.02%, “Tipsy” from 0.05%, “Drunk” from 0.08%, “Very drunk” from 0.10%, “Blackout risk” from 0.16%, and “Severe poisoning risk” from 0.30%. The labels are educational shorthand, not medical categories; blackouts and overdose can happen at lower levels.</p><p>Sources: <a href="https://www.gov.uk/government/consultations/updating-labelling-guidance-for-no-and-low-alcohol-alternatives/potential-health-impacts-of-changing-the-alcohol-free-descriptor-evidence-review">Widmark model and alcohol density</a>, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7564564/">time adjustment assumptions</a>, <a href="https://www.nhtsa.gov/risky-driving/drunk-driving">BAC and impairment</a>, and <a href="https://www.niaaa.nih.gov/publications/brochures-and-fact-sheets/interrupted-memories-alcohol-induced-blackouts">blackouts</a>.</p></div></details>
+      <aside class="emergency"><strong>Know the danger signs.</strong><p>If someone can’t be woken, has slow or irregular breathing, or has a seizure, call emergency services immediately (911 in the US). Stay with them. Don’t wait for a calculator result.</p><a href="https://www.niaaa.nih.gov/publications/brochures-and-fact-sheets/understanding-dangers-of-alcohol-overdose">Alcohol overdose signs</a></aside>
+    </div>
+  </main>
+  <footer><span>Bottle BAC · Educational estimates only</span><a href="https://github.com/bapple51/bottle-bac">View the source</a></footer>
+  <noscript><p class="noscript">Enable JavaScript to use this calculator. Your inputs are processed in your browser.</p></noscript>
+</body>
+</html>
