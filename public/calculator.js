@@ -2,15 +2,144 @@ export const KG_PER_LB = 0.45359237;
 export const ML_PER_US_OZ = 29.5735295625;
 const VOLUME_FACTORS = { ml: 1, l: 1000, oz: ML_PER_US_OZ };
 
+/**
+ * @param {number} bac Estimated BAC in percent: 0.08 means 0.08%.
+ * @param {number} alcoholGrams Alcohol in the selected portion, in grams.
+ * @returns {{
+ *   label: string,
+ *   description: string,
+ *   level: 'low' | 'medium' | 'high' | 'danger'
+ * }}
+ *
+ * These bands are descriptive UI ranges, not validated clinical stages.
+ * Never use this estimate to determine fitness to drive or rule out poisoning.
+ */
 export function classify(bac, alcoholGrams) {
-  if (alcoholGrams === 0) return { label: 'No alcohol selected', description: 'The selected portion contains no alcohol. This does not account for anything else you have drunk.', level: 'low' };
-  if (bac >= 0.30) return { label: 'Severe poisoning risk', description: 'This is a potentially life-threatening estimate. Do not drink this amount. If it has already been consumed, seek urgent medical help.', level: 'danger' };
-  if (bac >= 0.16) return { label: 'Blackout risk', description: 'Memory gaps become more likely, with major impairment of judgment and coordination. A blackout is not the same as passing out. Do not drink this amount.', level: 'danger' };
-  if (bac >= 0.10) return { label: 'Very drunk', description: 'Reaction time, balance, and clear thinking may be seriously impaired. Nausea and loss of coordination become more likely.', level: 'high' };
-  if (bac >= 0.08) return { label: 'Drunk', description: 'Judgment, coordination, concentration, and memory may be impaired. You might feel less impaired than you actually are.', level: 'high' };
-  if (bac >= 0.05) return { label: 'Tipsy', description: 'You may feel more relaxed and less inhibited, while coordination and reactions are already getting worse.', level: 'medium' };
-  if (bac >= 0.02) return { label: 'Buzzed', description: 'You may notice relaxation or a change in mood. Judgment and attention can already be affected.', level: 'medium' };
-  return { label: 'Little noticeable effect', description: 'You may feel little or no change, but impairment is still possible. A low estimate or feeling normal does not mean you are sober.', level: 'low' };
+  if (!Number.isFinite(bac) || !Number.isFinite(alcoholGrams)) {
+    throw new TypeError('bac and alcoholGrams must be finite numbers.');
+  }
+
+  if (bac < 0 || alcoholGrams < 0) {
+    throw new RangeError('bac and alcoholGrams must be non-negative.');
+  }
+
+  if (alcoholGrams === 0) return {
+    label: 'No alcohol selected',
+    description: 'The selected portion contains no alcohol. This does not account for anything else you have drunk.',
+    level: 'low'
+  };
+
+  // Added classification.
+  if (bac >= 0.35) return {
+    label: 'Critical poisoning risk',
+    description: 'Potentially fatal alcohol poisoning is possible, including loss of consciousness and dangerously slow breathing. Do not drink this amount. If already consumed, call emergency services now.',
+    level: 'danger'
+  };
+
+  if (bac >= 0.30) return {
+    label: 'Severe poisoning risk',
+    description: 'This is a potentially life-threatening estimate. Do not drink this amount. If it has already been consumed, seek urgent medical help.',
+    level: 'danger'
+  };
+
+  // Added classification.
+  if (bac >= 0.25) return {
+    label: 'High poisoning risk',
+    description: 'Severe intoxication can involve vomiting, profound confusion, or loss of consciousness. Do not drink this amount. If already consumed, seek urgent medical help.',
+    level: 'danger'
+  };
+
+  // Added classification.
+  if (bac >= 0.20) return {
+    label: 'Dangerous intoxication',
+    description: 'Severe impairment and alcohol poisoning are possible. Do not drink this amount. If someone is hard to wake, has seizures, or breathes slowly or irregularly, call emergency services immediately.',
+    level: 'danger'
+  };
+
+  // Added classification.
+  if (bac >= 0.18) return {
+    label: 'Severe impairment',
+    description: 'Judgment, coordination, and memory may be profoundly impaired. Do not drink this amount; being awake or able to talk does not rule out a blackout.',
+    level: 'danger'
+  };
+
+  if (bac >= 0.16) return {
+    label: 'Blackout risk',
+    description: 'Memory gaps become more likely, with major impairment of judgment and coordination. A blackout is not the same as passing out. Do not drink this amount.',
+    level: 'danger'
+  };
+
+  // Added classification.
+  if (bac >= 0.15) return {
+    label: 'Major loss of balance',
+    description: 'Muscle control and balance may be substantially impaired, and vomiting can occur. Do not drink this amount.',
+    level: 'high'
+  };
+
+  // Added classification.
+  if (bac >= 0.12) return {
+    label: 'Marked intoxication',
+    description: 'Speech may be slurred, thinking slowed, and coordination substantially reduced. Falls and other injuries become more likely.',
+    level: 'high'
+  };
+
+  if (bac >= 0.10) return {
+    label: 'Very drunk',
+    description: 'Reaction time, balance, and clear thinking may be seriously impaired. Nausea and loss of coordination become more likely.',
+    level: 'high'
+  };
+
+  if (bac >= 0.08) return {
+    label: 'Drunk',
+    description: 'Judgment, coordination, concentration, and memory may be impaired. You might feel less impaired than you actually are.',
+    level: 'high'
+  };
+
+  // Added classification.
+  if (bac >= 0.07) return {
+    label: 'Marked impairment',
+    description: 'Coordination, attention, and responses to unexpected events may be impaired even without feeling very drunk. Do not drive or operate machinery.',
+    level: 'high'
+  };
+
+  // Added classification.
+  if (bac >= 0.06) return {
+    label: 'Increasing impairment',
+    description: 'Reduced alertness and slower responses may make everyday tasks less reliable. Feeling confident does not mean your judgment or coordination is intact.',
+    level: 'medium'
+  };
+
+  if (bac >= 0.05) return {
+    label: 'Tipsy',
+    description: 'You may feel more relaxed and less inhibited, while coordination and reactions are already getting worse.',
+    level: 'medium'
+  };
+
+  // Added classification.
+  if (bac >= 0.04) return {
+    label: 'Reduced judgment',
+    description: 'Attention and judgment may be affected even when changes feel mild. Feeling relaxed or normal does not establish that you are unimpaired.',
+    level: 'medium'
+  };
+
+  if (bac >= 0.02) return {
+    label: 'Buzzed',
+    description: 'You may notice relaxation or a change in mood. Judgment and attention can already be affected.',
+    level: 'medium'
+  };
+
+  // Added classification.
+  if (bac >= 0.01) return {
+    label: 'Subtle effects',
+    description: 'You may notice little change, but this estimate cannot rule out impairment. Do not use it to decide whether you can drive.',
+    level: 'low'
+  };
+
+  return {
+    label: 'Little noticeable effect',
+    description: 'You may feel little or no change, but impairment is still possible. A low estimate or feeling normal does not mean you are sober.',
+    level: 'low'
+  };
 }
 
 export function calculate(input) {
