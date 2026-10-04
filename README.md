@@ -1,6 +1,6 @@
 # Bottle BAC
 
-A small, responsive alcohol impairment calculator for GitHub Pages. Enter body weight, bottle volume, ABV, the percentage of the bottle to drink, and drinking duration. The main result is a plain-language label such as **Buzzed**, **Tipsy**, **Drunk**, **Very drunk**, or **Blackout risk**, with an estimated BAC range and US standard drink count underneath.
+A small, responsive alcohol impairment calculator for GitHub Pages. Enter body weight, bottle volume, ABV, and drinking duration. Measure consumption by **Bottle %** or **Shots**. In shots mode, enter the size of each shot in mL or US fl oz and the number of shots you had from that bottle, including partial shots. The calculator shows the total consumed volume and equivalent bottle percentage. The main result is a plain-language label such as **Buzzed**, **Tipsy**, **Drunk**, **Very drunk**, or **Blackout risk**, with an estimated BAC range and US standard drink count underneath.
 
 **Live site:** https://bapple51.github.io/bottle-bac/
 
@@ -23,7 +23,7 @@ npm run check
 npm test
 ```
 
-No dependency installation is needed. Tests cover independently computed alcohol/BAC values, unit equivalence, duration, zero-alcohol cases, classification boundaries, extreme values, and input validation.
+No dependency installation is needed. Tests cover independently computed alcohol/BAC values, unit equivalence, shots and partial shots, duration, zero-alcohol cases, classification boundaries, extreme values, and input validation.
 
 ## GitHub Pages
 
@@ -33,10 +33,14 @@ In the repository's **Settings → Pages**, choose **GitHub Actions** as the sou
 
 ```text
 consumed mL = bottle mL × portion / 100
+# In shots mode instead:
+consumed mL = shot size in mL × shot count
 alcohol grams = consumed mL × ABV / 100 × 0.789
 BAC percent = max(0, alcohol grams / (weight kg × 1000 × r) × 100 − 0.015 × hours)
 US standard drinks = alcohol grams / 14
 ```
+
+Both consumption modes use the bottle's ABV. They are alternative inputs and are never added together. Shot sizes vary, so the default 1.5 US fl oz is editable and is not assumed to equal one US standard drink. Shots exceeding the entered bottle's volume are rejected instead of silently capped. Switching modes retains each mode's inputs; changing units preserves the represented quantity.
 
 The range uses two conventional distribution factors (`r = 0.68` and `r = 0.55`), not a personalized estimate or statistical confidence interval. Actual BAC can be outside this range. The label uses the upper model estimate. Labels are educational shorthand rather than clinical diagnoses, and blackout or overdose can occur at lower BACs than these thresholds.
 

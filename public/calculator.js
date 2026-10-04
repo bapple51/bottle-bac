@@ -168,8 +168,8 @@ export function classify(bac, alcoholGrams) {
 
 export function calculate(input) {
   if (!input || typeof input !== 'object') throw new Error('Enter your numbers to calculate an estimate.');
-  const { weight, weightUnit, volume, volumeUnit, abv, portion, hours } = input;
-  for (const [name, value] of Object.entries({ weight, volume, abv, portion, hours })) {
+  const { weight, weightUnit, volume, volumeUnit, abv, portion, hours, consumptionMode = 'portion', shotVolume, shotUnit, shotCount } = input;
+  for (const [name, value] of Object.entries({ weight, volume, abv, hours })) {
     if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error(`Enter a valid number for ${name}.`);
   }
   if (!['lb', 'kg'].includes(weightUnit)) throw new Error('Choose lb or kg for your weight.');
@@ -179,12 +179,29 @@ export function calculate(input) {
   if (weightKg < 0.453 || weightKg > 500) throw new Error('Enter a positive weight up to 500 kg (about 1,102 lb).');
   if (bottleMl <= 0 || bottleMl > 100000) throw new Error('Enter a bottle volume greater than 0 and up to 100 L.');
   if (abv < 0 || abv > 100) throw new Error('ABV must be between 0% and 100%.');
-  if (portion < 0 || portion > 100) throw new Error('The amount to drink must be between 0% and 100% of the bottle.');
   if (hours < 0 || hours > 24) throw new Error('Drinking duration must be between 0 and 24 hours.');
-  const consumedMl = bottleMl * portion / 100;
+  let consumedMl;
+  if (consumptionMode === 'portion') {
+    if (typeof portion !== 'number' || !Number.isFinite(portion)) throw new Error('Enter a valid number for portion.');
+    if (portion < 0 || portion > 100) throw new Error('The amount to drink must be between 0% and 100% of the bottle.');
+    consumedMl = bottleMl * portion / 100;
+  } else if (consumptionMode === 'shots') {
+    if (typeof shotVolume !== 'number' || !Number.isFinite(shotVolume) || shotVolume <= 0) throw new Error('Enter a shot size greater than 0.');
+    if (!['ml', 'oz'].includes(shotUnit)) throw new Error('Choose mL or US fl oz for your shot size.');
+    if (typeof shotCount !== 'number' || !Number.isFinite(shotCount) || shotCount < 0) throw new Error('Enter a number of shots of 0 or more.');
+    const shotMl = shotVolume * VOLUME_FACTORS[shotUnit];
+    if (shotMl > 100000) throw new Error('Enter a shot size no greater than 100 L.');
+    consumedMl = shotMl * shotCount;
+    // Unit conversion can introduce a tiny rounding difference for a full bottle.
+    if (!Number.isFinite(consumedMl) || consumedMl > bottleMl + bottleMl * 1e-9) throw new Error('Those shots exceed the bottle volume. Check the shot size, shot count, or bottle volume.');
+    consumedMl = Math.min(consumedMl, bottleMl);
+  } else {
+    throw new Error('Choose bottle percentage or shots to enter the amount.');
+  }
+  const portionPercent = consumedMl / bottleMl * 100;
   const alcoholGrams = consumedMl * abv / 100 * 0.789;
   const adjustment = 0.015 * hours;
   const bacLow = Math.max(0, alcoholGrams / (weightKg * 1000 * 0.68) * 100 - adjustment);
   const bacHigh = Math.max(0, alcoholGrams / (weightKg * 1000 * 0.55) * 100 - adjustment);
-  return { consumedMl, alcoholGrams, standardDrinks: alcoholGrams / 14, bacLow, bacHigh, ...classify(bacHigh, alcoholGrams) };
+  return { consumedMl, portionPercent, alcoholGrams, standardDrinks: alcoholGrams / 14, bacLow, bacHigh, ...classify(bacHigh, alcoholGrams) };
 }

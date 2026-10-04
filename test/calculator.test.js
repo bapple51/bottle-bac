@@ -97,3 +97,42 @@ test('malformed and out-of-range inputs are rejected instead of producing stale 
   }
   for (const patch of [{ weight: 0 }, { weight: -1 }, { weight: 501 }, { volume: 0 }, { volume: -1 }, { volume: 100001 }, { abv: -1 }, { abv: 101 }, { portion: -1 }, { portion: 101 }, { hours: -1 }, { hours: 25 }, { weightUnit: 'stone' }, { volumeUnit: 'constructor' }]) assert.throws(() => calculate({ ...sample, ...patch }));
 });
+
+test('three 50 mL shots use the bottle ABV and match drinking the same bottle percentage', () => {
+  const shots = calculate({ ...sample, abv: 40, consumptionMode: 'shots', shotVolume: 50, shotUnit: 'ml', shotCount: 3 });
+  close(shots.consumedMl, 150);
+  close(shots.portionPercent, 20);
+  close(shots.alcoholGrams, 47.34);
+  close(shots.bacLow, 0.07782352941176472);
+  close(shots.bacHigh, 0.09976363636363636);
+  assert.equal(shots.label, 'Clearly drunk');
+  const equivalent = calculate({ ...sample, abv: 40, portion: 20 });
+  close(shots.bacHigh, equivalent.bacHigh);
+  close(shots.standardDrinks, equivalent.standardDrinks);
+});
+
+test('US fluid ounce shots, partial shots, and exact full bottles retain their quantities', () => {
+  const shots = calculate({ ...sample, consumptionMode: 'shots', shotVolume: 1.5, shotUnit: 'oz', shotCount: 2.5 });
+  close(shots.consumedMl, 110.900735859375);
+  const metric = calculate({ ...sample, consumptionMode: 'shots', shotVolume: 1.5 * ML_PER_US_OZ, shotUnit: 'ml', shotCount: 2.5 });
+  close(shots.alcoholGrams, metric.alcoholGrams);
+  const full = calculate({ ...sample, volume: 0.75, volumeUnit: 'l', consumptionMode: 'shots', shotVolume: 50, shotUnit: 'ml', shotCount: 15 });
+  close(full.consumedMl, 750);
+  close(full.portionPercent, 100);
+});
+
+test('shots mode ignores bottle percentage, and portion mode ignores inactive shot inputs', () => {
+  const shots = { ...sample, consumptionMode: 'shots', shotVolume: 50, shotUnit: 'ml', shotCount: 3 };
+  close(calculate({ ...shots, portion: NaN }).consumedMl, 150);
+  close(calculate({ ...shots, portion: 100 }).consumedMl, 150);
+  const { portion, ...withoutPortion } = shots;
+  close(calculate(withoutPortion).consumedMl, 150);
+  close(calculate({ ...sample, shotVolume: NaN, shotCount: -1 }).consumedMl, 375);
+  assert.equal(calculate({ ...shots, shotCount: 0 }).label, 'No alcohol selected');
+});
+
+test('invalid shot values and amounts larger than the bottle are rejected', () => {
+  const shots = { ...sample, consumptionMode: 'shots', shotVolume: 50, shotUnit: 'ml', shotCount: 3 };
+  for (const patch of [{ shotVolume: 0 }, { shotVolume: -1 }, { shotVolume: NaN }, { shotVolume: Infinity }, { shotVolume: '50' }, { shotVolume: 100001 }, { shotUnit: 'l' }, { shotUnit: 'constructor' }, { shotCount: -1 }, { shotCount: NaN }, { shotCount: Infinity }, { shotCount: '3' }, { shotCount: 16 }, { consumptionMode: 'invalid' }]) assert.throws(() => calculate({ ...shots, ...patch }));
+  assert.throws(() => calculate({ ...shots, shotCount: 16 }), /exceed the bottle/);
+});
