@@ -49,6 +49,12 @@ export function classify(bac, alcoholGrams) {
     level: 'danger'
   };
 
+  if (bac >= 0.22) return {
+    label: 'Extreme intoxication',
+    description: 'Severe confusion, poor coordination, and memory gaps may occur. Alcohol poisoning is possible. Do not drink this amount; seek urgent medical help if it has already been consumed.',
+    level: 'danger'
+  };
+
   // Added classification.
   if (bac >= 0.20) return {
     label: 'Dangerous intoxication',
@@ -76,6 +82,12 @@ export function classify(bac, alcoholGrams) {
     level: 'high'
   };
 
+  if (bac >= 0.14) return {
+    label: 'Heavily drunk',
+    description: 'Thinking, speech, and muscle control may be seriously affected. Falls and injuries are a concern, even if you still feel alert.',
+    level: 'high'
+  };
+
   // Added classification.
   if (bac >= 0.12) return {
     label: 'Marked intoxication',
@@ -86,6 +98,12 @@ export function classify(bac, alcoholGrams) {
   if (bac >= 0.10) return {
     label: 'Very drunk',
     description: 'Reaction time, balance, and clear thinking may be seriously impaired. Nausea and loss of coordination become more likely.',
+    level: 'high'
+  };
+
+  if (bac >= 0.09) return {
+    label: 'Clearly drunk',
+    description: 'Poor coordination, slower reactions, and reduced self-control may become more noticeable. Feeling confident does not mean you can judge your impairment accurately.',
     level: 'high'
   };
 
@@ -119,6 +137,12 @@ export function classify(bac, alcoholGrams) {
   if (bac >= 0.04) return {
     label: 'Reduced judgment',
     description: 'Attention and judgment may be affected even when changes feel mild. Feeling relaxed or normal does not establish that you are unimpaired.',
+    level: 'medium'
+  };
+
+  if (bac >= 0.03) return {
+    label: 'Lightly tipsy',
+    description: 'You may feel relaxed or less inhibited. Attention and judgment can be affected even when the changes feel mild.',
     level: 'medium'
   };
 

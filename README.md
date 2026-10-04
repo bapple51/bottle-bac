@@ -42,13 +42,29 @@ The range uses two conventional distribution factors (`r = 0.68` and `r = 0.55`)
 
 | Upper model BAC | Label |
 | --- | --- |
-| Below 0.02% | Little noticeable effect |
-| 0.02–<0.05% | Buzzed |
-| 0.05–<0.08% | Tipsy |
-| 0.08–<0.10% | Drunk |
-| 0.10–<0.16% | Very drunk |
-| 0.16–<0.30% | Blackout risk |
-| 0.30% and above | Severe poisoning risk |
+| Below 0.01% | Little noticeable effect |
+| 0.01–<0.02% | Subtle effects |
+| 0.02–<0.03% | Buzzed |
+| 0.03–<0.04% | Lightly tipsy |
+| 0.04–<0.05% | Reduced judgment |
+| 0.05–<0.06% | Tipsy |
+| 0.06–<0.07% | Increasing impairment |
+| 0.07–<0.08% | Marked impairment |
+| 0.08–<0.09% | Drunk |
+| 0.09–<0.10% | Clearly drunk |
+| 0.10–<0.12% | Very drunk |
+| 0.12–<0.14% | Marked intoxication |
+| 0.14–<0.15% | Heavily drunk |
+| 0.15–<0.16% | Major loss of balance |
+| 0.16–<0.18% | Blackout risk |
+| 0.18–<0.20% | Severe impairment |
+| 0.20–<0.22% | Dangerous intoxication |
+| 0.22–<0.25% | Extreme intoxication |
+| 0.25–<0.30% | High poisoning risk |
+| 0.30–<0.35% | Severe poisoning risk |
+| 0.35% and above | Critical poisoning risk |
+
+The finer cutoffs are descriptive UI choices, not validated clinical thresholds. They should not be interpreted as precise predictions of symptoms or minimum BACs for poisoning or blackouts.
 
 Zero alcohol in the selected portion has its own label and does not imply overall sobriety. The model assumes full absorption and no pre-existing alcohol. It does not model individual sips, food, delayed absorption, age, health, medications, tolerance, or individual metabolism. It is an adult population model. BAC can rise after drinking stops. Never use this tool to decide whether to drive or when someone will be sober. Call emergency services immediately for inability to wake, slow/irregular breathing, or seizures.
 
